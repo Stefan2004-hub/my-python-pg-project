@@ -61,15 +61,15 @@ my_app/
 │   └── integration/
 ├── docker-compose.yml
 ├── init.sql
-├── requirements.txt
+├── pyproject.toml
 └── README.md
 ```
 
 ## Implementation Plan
 
-### Phase 1: Bootstrap the project
+### Phase 1: Bootstrap the project [done]
 - Create the application and test directory structure.
-- Create `requirements.txt` with FastAPI, Uvicorn, SQLAlchemy, Pydantic, psycopg2-binary, pandas, pytest, and testcontainers.
+- Create `pyproject.toml` with FastAPI, Uvicorn, SQLAlchemy, Pydantic, psycopg2-binary, pandas, pytest, and testcontainers.
 - Add `docker-compose.yml` for local PostgreSQL and app startup.
 - Add base README notes for running the app and tests.
 
@@ -82,7 +82,7 @@ Validation:
 - Dependency install succeeds in a clean virtual environment.
 - Docker Compose starts PostgreSQL without manual steps.
 
-### Phase 2: Core configuration and database plumbing
+### Phase 2: Core configuration and database plumbing [done]
 - Implement `app/core/config.py` with environment-based settings for database connection details.
 - Implement `app/core/database.py` with SQLAlchemy engine, session factory, and request-scoped DB dependency.
 - Wire the existing `init.sql` into local database initialization.

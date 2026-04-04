@@ -1,0 +1,2 @@
+-- Placeholder initialization script for local PostgreSQL bootstrap.
+-- Replace this with the project schema and seed data in a later phase.

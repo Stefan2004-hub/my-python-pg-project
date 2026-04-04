@@ -61,15 +61,15 @@ my_app/
 │   └── integration/
 ├── docker-compose.yml
 ├── init.sql
-├── requirements.txt
+├── pyproject.toml
 └── README.md
 ```
 
 ## Implementation Plan
 
-### Phase 1: Bootstrap the project
+### Phase 1: Bootstrap the project [done]
 - Create the application and test directory structure.
-- Create `requirements.txt` with FastAPI, Uvicorn, SQLAlchemy, Pydantic, psycopg2-binary, pandas, pytest, and testcontainers.
+- Create `pyproject.toml` with FastAPI, Uvicorn, SQLAlchemy, Pydantic, psycopg2-binary, pandas, pytest, and testcontainers.
 - Add `docker-compose.yml` for local PostgreSQL and app startup.
 - Add base README notes for running the app and tests.
 

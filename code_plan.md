@@ -99,7 +99,7 @@ Validation:
 - Health endpoint responds successfully.
 - DB session dependency can execute a simple query.
 
-### Phase 3: Model the database and API schemas
+### Phase 3: Model the database and API schemas [done]
 - Create SQLAlchemy models for `categories`, `products`, `customers`, `orders`, and `order_items`.
 - Define relationships:
   product -> category, order -> customer, order -> order_items, order_item -> product.

@@ -82,7 +82,7 @@ Validation:
 - Dependency install succeeds in a clean virtual environment.
 - Docker Compose starts PostgreSQL without manual steps.
 
-### Phase 2: Core configuration and database plumbing
+### Phase 2: Core configuration and database plumbing [done]
 - Implement `app/core/config.py` with environment-based settings for database connection details.
 - Implement `app/core/database.py` with SQLAlchemy engine, session factory, and request-scoped DB dependency.
 - Wire the existing `init.sql` into local database initialization.

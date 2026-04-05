@@ -15,10 +15,24 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-After that you can verify the app with:
+If you prefer `uv`, you can also install and sync dependencies with:
+
+```bash
+uv sync
+```
+
+After that you can verify the app with either an activated virtual environment or `uv run`.
+
+Activated venv:
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+With `uv`:
+
+```bash
+uv run uvicorn app.main:app --reload
 ```
 
 and, with PostgreSQL running via Docker Compose, check:
@@ -48,10 +62,22 @@ docker compose up -d postgres
 If `init.sql` is present in the repository root, PostgreSQL will execute it during first-time container initialization.
 
 ## Planned Run Command
-Start the FastAPI application with:
+Start the FastAPI application with either of these commands:
 
 ```bash
+source .venv/bin/activate
 uvicorn app.main:app --reload
+```
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+If `uvicorn` is reported as `command not found`, the project environment is not active on your shell `PATH`. Check with:
+
+```bash
+which uvicorn
+uv run which uvicorn
 ```
 
 ## Current Health Check

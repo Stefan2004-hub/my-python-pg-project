@@ -1,11 +1,19 @@
-"""Product ORM model."""
+from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import Base
+
+"""Product ORM model."""
+
+
+if TYPE_CHECKING:
+    from app.models.category import Category
+    from app.models.order_item import OrderItem
 
 
 class Product(Base):
@@ -22,9 +30,11 @@ class Product(Base):
         nullable=True,
     )
 
-    category: Mapped["Category | None"] = relationship(
+    category: Mapped[Category | None] = relationship(
+        "Category",
         back_populates="products",
     )
-    order_items: Mapped[list["OrderItem"]] = relationship(
+    order_items: Mapped[list[OrderItem]] = relationship(
+        "OrderItem",
         back_populates="product",
     )

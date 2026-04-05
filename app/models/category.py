@@ -1,9 +1,17 @@
-"""Category ORM model."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import Base
+
+"""Category ORM model."""
+
+
+if TYPE_CHECKING:
+    from app.models.product import Product
 
 
 class Category(Base):
@@ -15,6 +23,7 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    products: Mapped[list["Product"]] = relationship(
+    products: Mapped[list[Product]] = relationship(
+        "Product",
         back_populates="category",
     )

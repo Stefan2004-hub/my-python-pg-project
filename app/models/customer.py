@@ -1,9 +1,15 @@
-"""Customer ORM model."""
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from app.models import Base
+
+"""Customer ORM model."""
+
+
+if TYPE_CHECKING:
+    from app.models.order import Order
 
 
 class Customer(Base):
@@ -21,6 +27,7 @@ class Customer(Base):
     state: Mapped[str | None] = mapped_column(String(255), nullable=True)
     zip_code: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
-    orders: Mapped[list["Order"]] = relationship(
+    orders: Mapped[list[Order]] = relationship(
+        "Order",
         back_populates="customer",
     )

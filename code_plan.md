@@ -116,7 +116,7 @@ Validation:
 - Nested order responses serialize correctly.
 - Required and optional fields are enforced at the schema layer.
 
-### Phase 4: Build repositories
+### Phase 4: Build repositories [done]
 - Implement CRUD repositories for categories, products, customers, and orders.
 - Add product filtering, pagination, and text search over name and description.
 - Add order listing with status filtering.

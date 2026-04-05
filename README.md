@@ -121,12 +121,16 @@ Verify the model metadata loads:
 python -c "from app.models import Base; print(sorted(Base.metadata.tables.keys()))"
 ```
 
-Then generate the ERD:
+Then generate the ERD with either of these commands:
 
 ```bash
 python generate_erd.py
 ```
 
-If the command succeeds, the output file will be `entity_relation.png` in the project root.
+```bash
+uv run python generate_erd.py
+```
+
+If either command succeeds, the output file will be `entity_relation.png` in the project root.
 
 Common failure causes are missing development dependencies or GraphViz not being installed and available on `PATH`.

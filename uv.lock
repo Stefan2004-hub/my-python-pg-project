@@ -171,16 +171,20 @@ wheels = [
 ]
 
 [[package]]
-name = "eralchemy2"
-version = "1.4.1"
+name = "eralchemy"
+version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pygraphviz" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6d/84/d43709501e867d00448ce98db3ea2e02d67b71813e1587f9aa94d338fc24/eralchemy2-1.4.1.tar.gz", hash = "sha256:1c1ee49b26287a459c5c89aa3eba3d6a9d1b8e6bd245d9fbacc6b15560fc66a5", size = 24101, upload-time = "2024-05-20T09:27:37.414Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0e/c0/9c28acf903566a02de43f8fc6c572b8195ab0fa854016825e5690c77b57a/eralchemy-1.6.0.tar.gz", hash = "sha256:8f82d329ec0cd9c04469adf36b8889b5ea2583e7e53c0fd2e784e176e1e27c7a", size = 27416, upload-time = "2025-09-17T22:34:26.286Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/b2/192f1f9b0eebd0169549e291bb9ca1b522636c48b530af655524e2a20896/eralchemy2-1.4.1-py3-none-any.whl", hash = "sha256:be3ecd4e696172fe4b439a3010b08564c6f7c7323b9e9b4369e47da7a7b48428", size = 18565, upload-time = "2024-05-20T09:27:35.844Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/7d/428dae27f8de9b9712acb0a36b475fe0f96e65ba4f89198ec3be6432715b/eralchemy-1.6.0-py3-none-any.whl", hash = "sha256:29f3c9c6211892306cdf0605c2df3239ac9d322c63c0385f3959b9a0228fd1f5", size = 21286, upload-time = "2025-09-17T22:34:25.082Z" },
+]
+
+[package.optional-dependencies]
+graphviz = [
+    { name = "graphviz" },
 ]
 
 [[package]]
@@ -197,6 +201,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f7/e6/7adb4c5fa231e82c35b8f5741a9f2d055f520c29af5546fd70d3e8e1cd2e/fastapi-0.135.3.tar.gz", hash = "sha256:bd6d7caf1a2bdd8d676843cdcd2287729572a1ef524fc4d65c17ae002a1be654", size = 396524, upload-time = "2026-04-01T16:23:58.188Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/84/a4/5caa2de7f917a04ada20018eccf60d6cc6145b0199d55ca3711b0fc08312/fastapi-0.135.3-py3-none-any.whl", hash = "sha256:9b0f590c813acd13d0ab43dd8494138eb58e484bfac405db1f3187cfc5810d98", size = 117734, upload-time = "2026-04-01T16:23:59.328Z" },
+]
+
+[[package]]
+name = "graphviz"
+version = "0.21"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/b3/3ac91e9be6b761a4b30d66ff165e54439dcd48b83f4e20d644867215f6ca/graphviz-0.21.tar.gz", hash = "sha256:20743e7183be82aaaa8ad6c93f8893c923bd6658a04c32ee115edb3c8a835f78", size = 200434, upload-time = "2025-06-15T09:35:05.824Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/4c/e0ce1ef95d4000ebc1c11801f9b944fa5910ecc15b5e351865763d8657f8/graphviz-0.21-py3-none-any.whl", hash = "sha256:54f33de9f4f911d7e84e4191749cac8cc5653f815b06738c54db9a15ab8b1e42", size = 47300, upload-time = "2025-06-15T09:35:04.433Z" },
 ]
 
 [[package]]
@@ -325,14 +338,14 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "eralchemy2" },
+    { name = "eralchemy", extra = ["graphviz"] },
     { name = "pytest" },
     { name = "testcontainers" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "eralchemy2", marker = "extra == 'dev'", specifier = ">=1.4,<2.0" },
+    { name = "eralchemy", extras = ["graphviz"], marker = "extra == 'dev'", specifier = ">=1.5.0,<2.0" },
     { name = "fastapi", specifier = ">=0.115,<1.0" },
     { name = "pandas", specifier = ">=2.2,<3.0" },
     { name = "psycopg2-binary", specifier = ">=2.9,<3.0" },
@@ -682,12 +695,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/c3/b2/bc9c9196916376152
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/7e/a72dd26f3b0f4f2bf1dd8923c85f7ceb43172af56d63c7383eb62b332364/pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176", size = 1231151, upload-time = "2026-03-29T13:29:30.038Z" },
 ]
-
-[[package]]
-name = "pygraphviz"
-version = "1.14"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/66/ca/823d5c74a73d6b8b08e1f5aea12468ef334f0732c65cbb18df2a7f285c87/pygraphviz-1.14.tar.gz", hash = "sha256:c10df02377f4e39b00ae17c862f4ee7e5767317f1c6b2dfd04cea6acc7fc2bea", size = 106003, upload-time = "2024-09-29T18:31:12.471Z" }
 
 [[package]]
 name = "pytest"

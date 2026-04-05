@@ -99,7 +99,7 @@ pytest
 ## Generate an ERD
 The repository includes [`generate_erd.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_erd.py) for generating an entity relationship diagram from the SQLAlchemy models.
 
-This generates `entity_relation.png` from the SQLAlchemy model metadata in `app.models`. It does not inspect a live database.
+This generates `entity_relation.png` from the SQLAlchemy model metadata in `app.models`. It does not inspect a live database. The project uses `eralchemy` with the `graphviz` extra for this feature, not `eralchemy2` / `pygraphviz`.
 
 Install development dependencies first:
 
@@ -112,6 +112,8 @@ Make sure GraphViz is installed on the machine. On Fedora:
 ```bash
 sudo dnf install graphviz
 ```
+
+With the current project setup, `pip install -e ".[dev]"` or `uv sync` should not try to build `pygraphviz`.
 
 Verify the model metadata loads:
 

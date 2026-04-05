@@ -69,3 +69,36 @@ Use `pytest` for the test suite as it grows in later phases:
 ```bash
 pytest
 ```
+
+## Generate an ERD
+The repository includes [`generate_erd.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_erd.py) for generating an entity relationship diagram from the SQLAlchemy models.
+
+This generates `entity_relation.png` from the SQLAlchemy model metadata in `app.models`. It does not inspect a live database.
+
+Install development dependencies first:
+
+```bash
+pip install -e ".[dev]"
+```
+
+Make sure GraphViz is installed on the machine. On Fedora:
+
+```bash
+sudo dnf install graphviz
+```
+
+Verify the model metadata loads:
+
+```bash
+python -c "from app.models import Base; print(sorted(Base.metadata.tables.keys()))"
+```
+
+Then generate the ERD:
+
+```bash
+python generate_erd.py
+```
+
+If the command succeeds, the output file will be `entity_relation.png` in the project root.
+
+Common failure causes are missing development dependencies or GraphViz not being installed and available on `PATH`.

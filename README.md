@@ -147,3 +147,20 @@ uv run python generate_erd.py
 If either command succeeds, the output file will be `entity_relation.png` in the project root.
 
 Common failure causes are missing development dependencies or GraphViz not being installed and available on `PATH`.
+
+## Generate SQL DDL from Models
+The repository also includes [`generate_ddl.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_ddl.py) for generating PostgreSQL `CREATE TABLE` statements from SQLAlchemy model metadata.
+
+Run it with `uv`:
+
+```bash
+uv run python generate_ddl.py
+```
+
+Or from an activated environment:
+
+```bash
+python generate_ddl.py
+```
+
+If the command succeeds, it writes `generated_schema.sql` in the project root. This script does not create database tables and does not replace `init.sql` automatically; use it as a model-derived reference and review the output before copying changes into the Docker initialization schema.

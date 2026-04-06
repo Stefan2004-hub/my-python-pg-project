@@ -170,7 +170,7 @@ Validation:
 - Order total calculation is deterministic.
 - Pandas reports return JSON-serializable records, not raw DataFrames.
 
-### Phase 6: Expose API routes
+### Phase 6: Expose API routes [done]
 - Add route modules for categories, products, orders, and reports.
 - Implement category and product CRUD endpoints.
 - Implement order create, get-by-id, and list endpoints.

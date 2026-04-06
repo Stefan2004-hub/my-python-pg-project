@@ -44,3 +44,8 @@ class Order(Base):
         back_populates="order",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def items(self) -> list[OrderItem]:
+        """Alias used by API schemas for nested order items."""
+        return self.order_items

@@ -7,6 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.routes import (
+    categories_router,
+    orders_router,
+    products_router,
+    reports_router,
+)
 from app.core.config import get_settings
 from app.core.database import check_database_connection
 from app.core.exceptions import AppError, ServiceUnavailableError
@@ -27,6 +33,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(categories_router)
+app.include_router(products_router)
+app.include_router(orders_router)
+app.include_router(reports_router)
 
 
 @app.exception_handler(AppError)

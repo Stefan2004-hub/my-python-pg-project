@@ -188,7 +188,7 @@ Validation:
 - Invalid payloads and missing records return controlled errors.
 - Filtering and pagination parameters affect results correctly.
 
-### Phase 7: Testing, documentation, and finish criteria
+### Phase 7: Testing, documentation, and finish criteria [done]
 - Add unit tests for repositories and services.
 - Add integration tests using `testcontainers-python` with real PostgreSQL.
 - Validate end-to-end order creation and report generation flows.

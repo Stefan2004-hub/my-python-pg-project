@@ -2,10 +2,12 @@
 
 import logging
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from app.api.routes import (
     categories_router,
@@ -14,7 +16,7 @@ from app.api.routes import (
     reports_router,
 )
 from app.core.config import get_settings
-from app.core.database import check_database_connection
+from app.core.database import get_db
 from app.core.exceptions import AppError, ServiceUnavailableError
 
 
@@ -76,10 +78,10 @@ def read_root() -> dict[str, str]:
 
 
 @app.get("/health", tags=["meta"])
-def health_check() -> dict[str, str]:
+def health_check(db: Session = Depends(get_db)) -> dict[str, str]:
     """Return application and database health."""
     try:
-        check_database_connection()
+        db.execute(text("SELECT 1"))
     except SQLAlchemyError as exc:
         raise ServiceUnavailableError("Database connectivity check failed") from exc
 

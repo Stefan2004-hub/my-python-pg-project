@@ -103,11 +103,39 @@ curl http://127.0.0.1:8000/health
 The endpoint returns success only when the application is up and PostgreSQL is reachable.
 
 ## Current Test Command
-Use `pytest` for the test suite as it grows in later phases:
+Run the unit test suite with:
 
 ```bash
-pytest
+uv run --extra dev pytest tests/unit
 ```
+
+Run the PostgreSQL integration tests with Docker available:
+
+```bash
+uv run --extra dev pytest tests/integration
+```
+
+The integration tests use Testcontainers to start a disposable PostgreSQL container, apply `init.sql`, and exercise the FastAPI app against that real database.
+
+Run all tests with:
+
+```bash
+uv run --extra dev pytest
+```
+
+## API Documentation
+When the FastAPI app is running, OpenAPI documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The main API groups are:
+
+- `categories`: create, list, retrieve, update, and delete categories.
+- `products`: create, list, retrieve, update, delete, filter by category, and search by text.
+- `orders`: create orders, list by status, retrieve by ID, update status, and delete.
+- `reports`: read sales by product/category, top products, daily sales, and customer order history.
 
 ## Generate an ERD
 The repository includes [`generate_erd.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_erd.py) for generating an entity relationship diagram from the SQLAlchemy models.

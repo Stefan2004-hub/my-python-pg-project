@@ -59,7 +59,20 @@ Use Docker Compose to start the local PostgreSQL service:
 docker compose up -d postgres
 ```
 
-If `init.sql` is present in the repository root, PostgreSQL will execute it during first-time container initialization.
+The FastAPI app does not run `init.sql`. The PostgreSQL Docker image runs it during first-time database initialization because `docker-compose.yml` mounts it to:
+
+```text
+/docker-entrypoint-initdb.d/init.sql
+```
+
+PostgreSQL only runs files in that directory when the database volume is new and empty. If you already started PostgreSQL before `init.sql` contained the schema, recreate the local database volume so the script runs again:
+
+```bash
+docker compose down -v
+docker compose up -d postgres
+```
+
+Warning: `docker compose down -v` deletes the local PostgreSQL volume and all local database data.
 
 ## Planned Run Command
 Start the FastAPI application with either of these commands:

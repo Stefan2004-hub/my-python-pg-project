@@ -154,7 +154,7 @@ Validation:
 - Verify constraints exist for customer email uniqueness, positive quantities, and non-negative money values.
 - Verify repository code can write to the initialized PostgreSQL schema once services/routes begin using the real database.
 
-### Phase 5: Add business logic services
+### Phase 5: Add business logic services [done]
 - Implement category and product services to handle validation and orchestration beyond raw CRUD.
 - Implement order service for order creation workflow, total calculation, and domain validation.
 - Add inventory validation only if the database or project requirements expose inventory state; otherwise leave it out of v1.

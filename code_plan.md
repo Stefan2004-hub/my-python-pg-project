@@ -132,7 +132,29 @@ Validation:
 - Repository queries load relationships correctly where needed.
 - Search, pagination, and status filters behave predictably.
 
-### Phase 5: Add business logic services
+### Phase 4.5: Implement PostgreSQL schema initialization [done]
+- Replace the placeholder `init.sql` with PostgreSQL DDL generated from the current SQLAlchemy model contract.
+- Create the five application tables: `categories`, `products`, `customers`, `orders`, and `order_items`.
+- Define integer primary keys, required core text fields, nullable optional description/contact/address fields, `NUMERIC(10, 2)` money fields, and `TIMESTAMP WITH TIME ZONE` for `orders.order_date`.
+- Add foreign keys for `products.category_id -> categories.id`, `orders.customer_id -> customers.id`, `order_items.order_id -> orders.id`, and `order_items.product_id -> products.id`.
+- Add `ON DELETE CASCADE` for `order_items.order_id` so order item rows are removed when an order is deleted.
+- Do not cascade-delete products, customers, or categories by default.
+- Add useful constraints such as unique `customers.email`, positive `order_items.quantity`, and non-negative money fields.
+- Keep seed data optional; table creation is the required deliverable for this task.
+- Keep Alembic as a future recommendation only; do not introduce migrations in this first-pass task.
+
+Expected outputs:
+- Local PostgreSQL creates the application tables during first-time Docker container initialization through the existing `docker-compose.yml` mount for `init.sql`.
+- The PostgreSQL schema matches the current ORM model and repository-layer expectations.
+- The SQLite `Base.metadata.create_all(...)` flow remains test-only and is not treated as the local PostgreSQL schema path.
+
+Validation:
+- Recreate the local PostgreSQL volume/container and verify `init.sql` creates all five expected tables.
+- Verify all four foreign-key relationships exist.
+- Verify constraints exist for customer email uniqueness, positive quantities, and non-negative money values.
+- Verify repository code can write to the initialized PostgreSQL schema once services/routes begin using the real database.
+
+### Phase 5: Add business logic services [done]
 - Implement category and product services to handle validation and orchestration beyond raw CRUD.
 - Implement order service for order creation workflow, total calculation, and domain validation.
 - Add inventory validation only if the database or project requirements expose inventory state; otherwise leave it out of v1.
@@ -148,7 +170,7 @@ Validation:
 - Order total calculation is deterministic.
 - Pandas reports return JSON-serializable records, not raw DataFrames.
 
-### Phase 6: Expose API routes
+### Phase 6: Expose API routes [done]
 - Add route modules for categories, products, orders, and reports.
 - Implement category and product CRUD endpoints.
 - Implement order create, get-by-id, and list endpoints.
@@ -166,7 +188,7 @@ Validation:
 - Invalid payloads and missing records return controlled errors.
 - Filtering and pagination parameters affect results correctly.
 
-### Phase 7: Testing, documentation, and finish criteria
+### Phase 7: Testing, documentation, and finish criteria [done]
 - Add unit tests for repositories and services.
 - Add integration tests using `testcontainers-python` with real PostgreSQL.
 - Validate end-to-end order creation and report generation flows.

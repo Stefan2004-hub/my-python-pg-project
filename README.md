@@ -59,7 +59,20 @@ Use Docker Compose to start the local PostgreSQL service:
 docker compose up -d postgres
 ```
 
-If `init.sql` is present in the repository root, PostgreSQL will execute it during first-time container initialization.
+The FastAPI app does not run `init.sql`. The PostgreSQL Docker image runs it during first-time database initialization because `docker-compose.yml` mounts it to:
+
+```text
+/docker-entrypoint-initdb.d/init.sql
+```
+
+PostgreSQL only runs files in that directory when the database volume is new and empty. If you already started PostgreSQL before `init.sql` contained the schema, recreate the local database volume so the script runs again:
+
+```bash
+docker compose down -v
+docker compose up -d postgres
+```
+
+Warning: `docker compose down -v` deletes the local PostgreSQL volume and all local database data.
 
 ## Planned Run Command
 Start the FastAPI application with either of these commands:
@@ -90,11 +103,39 @@ curl http://127.0.0.1:8000/health
 The endpoint returns success only when the application is up and PostgreSQL is reachable.
 
 ## Current Test Command
-Use `pytest` for the test suite as it grows in later phases:
+Run the unit test suite with:
 
 ```bash
-pytest
+uv run --extra dev pytest tests/unit
 ```
+
+Run the PostgreSQL integration tests with Docker available:
+
+```bash
+uv run --extra dev pytest tests/integration
+```
+
+The integration tests use Testcontainers to start a disposable PostgreSQL container, apply `init.sql`, and exercise the FastAPI app against that real database.
+
+Run all tests with:
+
+```bash
+uv run --extra dev pytest
+```
+
+## API Documentation
+When the FastAPI app is running, OpenAPI documentation is available at:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The main API groups are:
+
+- `categories`: create, list, retrieve, update, and delete categories.
+- `products`: create, list, retrieve, update, delete, filter by category, and search by text.
+- `orders`: create orders, list by status, retrieve by ID, update status, and delete.
+- `reports`: read sales by product/category, top products, daily sales, and customer order history.
 
 ## Generate an ERD
 The repository includes [`generate_erd.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_erd.py) for generating an entity relationship diagram from the SQLAlchemy models.
@@ -134,3 +175,20 @@ uv run python generate_erd.py
 If either command succeeds, the output file will be `entity_relation.png` in the project root.
 
 Common failure causes are missing development dependencies or GraphViz not being installed and available on `PATH`.
+
+## Generate SQL DDL from Models
+The repository also includes [`generate_ddl.py`](/home/dstefan/Documents/tools/my-python-pg-project/generate_ddl.py) for generating PostgreSQL `CREATE TABLE` statements from SQLAlchemy model metadata.
+
+Run it with `uv`:
+
+```bash
+uv run python generate_ddl.py
+```
+
+Or from an activated environment:
+
+```bash
+python generate_ddl.py
+```
+
+If the command succeeds, it writes `generated_schema.sql` in the project root. This script does not create database tables and does not replace `init.sql` automatically; use it as a model-derived reference and review the output before copying changes into the Docker initialization schema.

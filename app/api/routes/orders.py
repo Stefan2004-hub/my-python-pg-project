@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, Field
@@ -53,7 +54,7 @@ def get_order_service(db: Session = Depends(get_db)) -> OrderService:
 @router.post("", response_model=OrderRead, status_code=status.HTTP_201_CREATED)
 def create_order(
     payload: OrderCreateRequest,
-    service: OrderService = Depends(get_order_service),
+    service: Annotated[OrderService, Depends(get_order_service)],
 ):
     service_payload = OrderCreate(
         customer_id=payload.customer_id,
@@ -75,10 +76,10 @@ def create_order(
 
 @router.get("", response_model=OrderPage)
 def list_orders(
+    service: Annotated[OrderService, Depends(get_order_service)],
     page: int = 1,
     page_size: int = 20,
     status: str | None = None,
-    service: OrderService = Depends(get_order_service),
 ):
     items, total = service.list(page=page, page_size=page_size, status=status)
     return OrderPage(items=items, total=total, page=page, page_size=page_size)
@@ -87,7 +88,7 @@ def list_orders(
 @router.get("/{order_id}", response_model=OrderRead)
 def get_order(
     order_id: int,
-    service: OrderService = Depends(get_order_service),
+    service: Annotated[OrderService, Depends(get_order_service)],
 ):
     return service.get_by_id(order_id)
 
@@ -96,7 +97,7 @@ def get_order(
 def update_order_status(
     order_id: int,
     payload: OrderStatusUpdate,
-    service: OrderService = Depends(get_order_service),
+    service: Annotated[OrderService, Depends(get_order_service)],
 ):
     return service.update_status(order_id, payload.status)
 
@@ -105,7 +106,7 @@ def update_order_status(
 def update_order(
     order_id: int,
     payload: OrderUpdate,
-    service: OrderService = Depends(get_order_service),
+    service: Annotated[OrderService, Depends(get_order_service)],
 ):
     return service.update(order_id, payload)
 
@@ -113,7 +114,7 @@ def update_order(
 @router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_order(
     order_id: int,
-    service: OrderService = Depends(get_order_service),
+    service: Annotated[OrderService, Depends(get_order_service)],
 ):
     service.delete(order_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,7 @@
 """Category API routes."""
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -28,16 +30,16 @@ def get_category_service(db: Session = Depends(get_db)) -> CategoryService:
 @router.post("", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
 def create_category(
     payload: CategoryCreate,
-    service: CategoryService = Depends(get_category_service),
+    service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     return service.create(payload)
 
 
 @router.get("", response_model=CategoryPage)
 def list_categories(
+    service: Annotated[CategoryService, Depends(get_category_service)],
     page: int = 1,
     page_size: int = 20,
-    service: CategoryService = Depends(get_category_service),
 ):
     items, total = service.list(page=page, page_size=page_size)
     return CategoryPage(items=items, total=total, page=page, page_size=page_size)
@@ -46,7 +48,7 @@ def list_categories(
 @router.get("/{category_id}", response_model=CategoryRead)
 def get_category(
     category_id: int,
-    service: CategoryService = Depends(get_category_service),
+    service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     return service.get_by_id(category_id)
 
@@ -55,7 +57,7 @@ def get_category(
 def update_category(
     category_id: int,
     payload: CategoryUpdate,
-    service: CategoryService = Depends(get_category_service),
+    service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     return service.update(category_id, payload)
 
@@ -63,7 +65,7 @@ def update_category(
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(
     category_id: int,
-    service: CategoryService = Depends(get_category_service),
+    service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     service.delete(category_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

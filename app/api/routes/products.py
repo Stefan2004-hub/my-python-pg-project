@@ -1,5 +1,7 @@
 """Product API routes."""
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -28,18 +30,18 @@ def get_product_service(db: Session = Depends(get_db)) -> ProductService:
 @router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 def create_product(
     payload: ProductCreate,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return service.create(payload)
 
 
 @router.get("", response_model=ProductPage)
 def list_products(
+    service: Annotated[ProductService, Depends(get_product_service)],
     page: int = 1,
     page_size: int = 20,
     category_id: int | None = None,
     search: str | None = None,
-    service: ProductService = Depends(get_product_service),
 ):
     items, total = service.list(
         page=page,
@@ -53,7 +55,7 @@ def list_products(
 @router.get("/{product_id}", response_model=ProductRead)
 def get_product(
     product_id: int,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return service.get_by_id(product_id)
 
@@ -62,7 +64,7 @@ def get_product(
 def update_product(
     product_id: int,
     payload: ProductUpdate,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     return service.update(product_id, payload)
 
@@ -70,7 +72,7 @@ def update_product(
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
     product_id: int,
-    service: ProductService = Depends(get_product_service),
+    service: Annotated[ProductService, Depends(get_product_service)],
 ):
     service.delete(product_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

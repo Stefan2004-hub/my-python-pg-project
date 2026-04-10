@@ -11,12 +11,21 @@ class OrderItemBase(OrmSchema):
 
     product_id: int
     quantity: int
+
+
+class OrderItemPricedBase(OrderItemBase):
+    """Order item fields with server-calculated pricing."""
+
     unit_price: Decimal
     line_total: Decimal
 
 
 class OrderItemCreate(OrderItemBase):
     """Payload for creating an order item."""
+
+
+class OrderItemPricedCreate(OrderItemPricedBase):
+    """Trusted payload for persisting an order item."""
 
 
 class OrderItemUpdate(OrmSchema):
@@ -28,7 +37,7 @@ class OrderItemUpdate(OrmSchema):
     line_total: Decimal | None = None
 
 
-class OrderItemRead(OrderItemBase):
+class OrderItemRead(OrderItemPricedBase):
     """Order item response payload."""
 
     id: int
@@ -44,10 +53,19 @@ class OrderBase(OrmSchema):
     status: str
 
 
-class OrderCreate(OrderBase):
+class OrderCreate(OrmSchema):
     """Payload for creating an order."""
 
+    customer_id: int
+    order_date: datetime | None = None
+    status: str
     items: list[OrderItemCreate]
+
+
+class OrderPricedCreate(OrderBase):
+    """Trusted payload for persisting an order."""
+
+    items: list[OrderItemPricedCreate]
 
 
 class OrderUpdate(OrmSchema):

@@ -1,11 +1,10 @@
 """Order API routes."""
 
 from datetime import datetime
-from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -19,12 +18,16 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 class OrderItemCreateRequest(BaseModel):
     """Public order item create payload."""
 
+    model_config = ConfigDict(extra="forbid")
+
     product_id: int
     quantity: int = Field(gt=0)
 
 
 class OrderCreateRequest(BaseModel):
     """Public order create payload."""
+
+    model_config = ConfigDict(extra="forbid")
 
     customer_id: int
     order_date: datetime | None = None
@@ -59,14 +62,11 @@ def create_order(
     service_payload = OrderCreate(
         customer_id=payload.customer_id,
         order_date=payload.order_date,
-        total_amount=Decimal("0.00"),
         status=payload.status,
         items=[
             OrderItemCreate(
                 product_id=item.product_id,
                 quantity=item.quantity,
-                unit_price=Decimal("0.00"),
-                line_total=Decimal("0.00"),
             )
             for item in payload.items
         ],

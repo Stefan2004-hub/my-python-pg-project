@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.core.exceptions import DomainValidationError, NotFoundError
 from app.models import Customer, Order, OrderItem, Product
-from app.schemas.order import OrderCreate, OrderUpdate
+from app.schemas.order import OrderPricedCreate, OrderUpdate
 
 
 class OrderRepository:
@@ -14,7 +14,7 @@ class OrderRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def create_order(self, payload: OrderCreate) -> Order:
+    def create_order(self, payload: OrderPricedCreate) -> Order:
         customer = self.db.get(Customer, payload.customer_id)
         if customer is None:
             raise NotFoundError("Customer not found")

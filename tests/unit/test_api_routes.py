@@ -123,6 +123,54 @@ def test_product_routes_crud_filter_search_and_delete(client: TestClient):
     assert client.delete(f"/products/{other['id']}").status_code == 204
 
 
+def test_customer_routes_crud_list_and_reject_duplicate_email(client: TestClient):
+    create_response = client.post(
+        "/customers",
+        json={
+            "first_name": "Ada",
+            "last_name": "Lovelace",
+            "email": "ada.routes@example.com",
+            "phone": "123456",
+            "address": "1 Main St",
+            "city": "London",
+            "state": "LDN",
+            "zip_code": "12345",
+        },
+    )
+    assert create_response.status_code == 201
+    customer = create_response.json()
+
+    duplicate_response = client.post(
+        "/customers",
+        json={
+            "first_name": "Duplicate",
+            "last_name": "Customer",
+            "email": "ada.routes@example.com",
+        },
+    )
+    assert duplicate_response.status_code == 422
+    assert duplicate_response.json()["error_code"] == "validation_error"
+
+    listed = client.get("/customers")
+    assert listed.status_code == 200
+    assert listed.json()["total"] == 1
+    assert listed.json()["items"][0]["email"] == "ada.routes@example.com"
+
+    fetched = client.get(f"/customers/{customer['id']}")
+    assert fetched.status_code == 200
+    assert fetched.json()["id"] == customer["id"]
+
+    updated = client.put(
+        f"/customers/{customer['id']}",
+        json={"city": "Athens"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["city"] == "Athens"
+
+    assert client.delete(f"/customers/{customer['id']}").status_code == 204
+    assert client.get(f"/customers/{customer['id']}").status_code == 404
+
+
 def test_order_routes_create_list_status_update_and_delete(
     client: TestClient,
     api_db_session: Session,

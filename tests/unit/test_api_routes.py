@@ -98,6 +98,7 @@ def test_product_routes_crud_filter_search_and_delete(client: TestClient):
             "name": "Python Handbook",
             "description": "Programming guide",
             "price": "25.00",
+            "stock_quantity": 4,
             "category_id": category["id"],
         },
     )
@@ -107,6 +108,7 @@ def test_product_routes_crud_filter_search_and_delete(client: TestClient):
             "name": "Desk Lamp",
             "description": "Office light",
             "price": "15.00",
+            "stock_quantity": 3,
             "category_id": None,
         },
     ).json()
@@ -115,10 +117,15 @@ def test_product_routes_crud_filter_search_and_delete(client: TestClient):
     assert filtered.status_code == 200
     assert filtered.json()["total"] == 1
     assert filtered.json()["items"][0]["name"] == "Python Handbook"
+    assert filtered.json()["items"][0]["stock_quantity"] == 4
 
-    updated = client.put(f"/products/{other['id']}", json={"price": "17.50"})
+    updated = client.put(
+        f"/products/{other['id']}",
+        json={"price": "17.50", "stock_quantity": 7},
+    )
     assert updated.status_code == 200
     assert updated.json()["price"] == "17.50"
+    assert updated.json()["stock_quantity"] == 7
 
     assert client.delete(f"/products/{other['id']}").status_code == 204
 
@@ -182,6 +189,7 @@ def test_order_routes_create_list_status_update_and_delete(
             "name": "Monitor",
             "description": "Display",
             "price": "100.00",
+            "stock_quantity": 5,
             "category_id": None,
         },
     ).json()
@@ -199,6 +207,9 @@ def test_order_routes_create_list_status_update_and_delete(
     assert order["total_amount"] == "200.00"
     assert order["items"][0]["unit_price"] == "100.00"
     assert order["items"][0]["line_total"] == "200.00"
+    product_after_order = client.get(f"/products/{product['id']}")
+    assert product_after_order.status_code == 200
+    assert product_after_order.json()["stock_quantity"] == 3
 
     listed = client.get("/orders?status=pending")
     assert listed.status_code == 200
@@ -225,6 +236,7 @@ def test_order_route_rejects_client_supplied_item_prices(
             "name": "Monitor",
             "description": "Display",
             "price": "100.00",
+            "stock_quantity": 2,
             "category_id": None,
         },
     ).json()
@@ -248,6 +260,39 @@ def test_order_route_rejects_client_supplied_item_prices(
     assert response.status_code == 422
 
 
+def test_order_route_rejects_insufficient_stock(
+    client: TestClient,
+    api_db_session: Session,
+):
+    customer = _create_customer(api_db_session, email="insufficient-stock@example.com")
+    product = client.post(
+        "/products",
+        json={
+            "name": "Monitor",
+            "description": "Display",
+            "price": "100.00",
+            "stock_quantity": 1,
+            "category_id": None,
+        },
+    ).json()
+
+    response = client.post(
+        "/orders",
+        json={
+            "customer_id": customer.id,
+            "status": "pending",
+            "items": [{"product_id": product["id"], "quantity": 2}],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error_code"] == "validation_error"
+    product_after_order = client.get(f"/products/{product['id']}")
+    assert product_after_order.json()["stock_quantity"] == 1
+    listed = client.get("/orders")
+    assert listed.json()["total"] == 0
+
+
 def test_report_routes_return_json_arrays(client: TestClient, api_db_session: Session):
     category = client.post("/categories", json={"name": "Furniture"}).json()
     customer = _create_customer(api_db_session, email="reports-api@example.com")
@@ -257,6 +302,7 @@ def test_report_routes_return_json_arrays(client: TestClient, api_db_session: Se
             "name": "Chair",
             "description": "Office chair",
             "price": "55.00",
+            "stock_quantity": 2,
             "category_id": category["id"],
         },
     ).json()

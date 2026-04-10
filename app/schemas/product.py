@@ -11,6 +11,7 @@ class ProductBase(OrmSchema):
     name: str
     description: str | None = None
     price: Decimal
+    stock_quantity: int = 0
     category_id: int | None = None
 
 
@@ -24,6 +25,7 @@ class ProductUpdate(OrmSchema):
     name: str | None = None
     description: str | None = None
     price: Decimal | None = None
+    stock_quantity: int | None = None
     category_id: int | None = None
 
 

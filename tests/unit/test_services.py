@@ -57,16 +57,18 @@ def test_category_and_product_services_wrap_crud(db_session):
             name="USB Cable",
             description="Braided cable",
             price=Decimal("8.50"),
+            stock_quantity=10,
             category_id=category.id,
         )
     )
     updated = product_service.update(
         product.id,
-        ProductUpdate(price=Decimal("9.25")),
+        ProductUpdate(price=Decimal("9.25"), stock_quantity=12),
     )
     items, total = product_service.list(category_id=category.id, search="usb")
 
     assert updated.price == Decimal("9.25")
+    assert updated.stock_quantity == 12
     assert total == 1
     assert items[0].id == product.id
 
@@ -87,6 +89,33 @@ def test_product_service_rejects_negative_prices(db_session):
                 category_id=None,
             )
         )
+
+
+def test_product_service_rejects_negative_stock(db_session):
+    product_service = ProductService(db_session)
+
+    with pytest.raises(DomainValidationError, match="stock"):
+        product_service.create(
+            ProductCreate(
+                name="Invalid",
+                description=None,
+                price=Decimal("1.00"),
+                stock_quantity=-1,
+                category_id=None,
+            )
+        )
+
+    product = product_service.create(
+        ProductCreate(
+            name="Valid",
+            description=None,
+            price=Decimal("1.00"),
+            stock_quantity=1,
+            category_id=None,
+        )
+    )
+    with pytest.raises(DomainValidationError, match="stock"):
+        product_service.update(product.id, ProductUpdate(stock_quantity=-1))
 
 
 def test_customer_service_crud_and_rejects_duplicate_email(db_session):
@@ -124,6 +153,7 @@ def test_order_service_recomputes_totals_from_product_prices(db_session):
             name="Desk",
             description="Standing desk",
             price=Decimal("120.00"),
+            stock_quantity=5,
             category_id=None,
         )
     )
@@ -133,6 +163,29 @@ def test_order_service_recomputes_totals_from_product_prices(db_session):
     assert order.total_amount == Decimal("360.00")
     assert order.order_items[0].unit_price == Decimal("120.00")
     assert order.order_items[0].line_total == Decimal("360.00")
+    assert product.stock_quantity == 2
+
+
+def test_order_service_rejects_insufficient_stock(db_session):
+    from app.repositories import CustomerRepository
+
+    product_service = ProductService(db_session)
+    order_service = OrderService(db_session)
+    customer = CustomerRepository(db_session).create(_customer_payload("stock@example.com"))
+    product = product_service.create(
+        ProductCreate(
+            name="Desk",
+            description="Standing desk",
+            price=Decimal("120.00"),
+            stock_quantity=2,
+            category_id=None,
+        )
+    )
+
+    with pytest.raises(DomainValidationError, match="Insufficient stock"):
+        order_service.create_order(_order_payload(customer.id, product.id, quantity=3))
+
+    assert product.stock_quantity == 2
 
 
 def test_order_service_rejects_non_positive_quantities(db_session):
@@ -146,6 +199,7 @@ def test_order_service_rejects_non_positive_quantities(db_session):
             name="Mouse Pad",
             description=None,
             price=Decimal("4.00"),
+            stock_quantity=1,
             category_id=None,
         )
     )
@@ -165,6 +219,7 @@ def test_order_service_list_status_update_and_delete(db_session):
             name="Headphones",
             description=None,
             price=Decimal("60.00"),
+            stock_quantity=1,
             category_id=None,
         )
     )
@@ -196,6 +251,7 @@ def test_report_service_returns_json_ready_core_reports(db_session):
             name="Chair",
             description="Office chair",
             price=Decimal("55.00"),
+            stock_quantity=2,
             category_id=category.id,
         )
     )

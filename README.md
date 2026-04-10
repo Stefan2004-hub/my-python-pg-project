@@ -65,14 +65,31 @@ The FastAPI app does not run `init.sql`. The PostgreSQL Docker image runs it dur
 /docker-entrypoint-initdb.d/init.sql
 ```
 
-PostgreSQL only runs files in that directory when the database volume is new and empty. If you already started PostgreSQL before `init.sql` contained the schema, recreate the local database volume so the script runs again:
+PostgreSQL only runs files in that directory when the database volume is new and empty. For existing databases, use Alembic migrations instead of deleting the Docker volume.
+
+## Database Migrations
+This project uses Alembic for in-place schema changes against existing PostgreSQL databases. Alembic reads the database connection from the same environment-backed settings as the application.
+
+For a database that was created before Alembic was added and already has the baseline tables, stamp the baseline revision once, then apply pending migrations:
 
 ```bash
-docker compose down -v
-docker compose up -d postgres
+uv run --extra dev alembic stamp 20260411_0001
+uv run --extra dev alembic upgrade head
 ```
 
-Warning: `docker compose down -v` deletes the local PostgreSQL volume and all local database data.
+For a database that is already tracked by Alembic, only run:
+
+```bash
+uv run --extra dev alembic upgrade head
+```
+
+For brand-new local Docker databases, `init.sql` still creates the full current schema during first-time PostgreSQL initialization. If you want Alembic to track that schema for future migrations, stamp it at the current head once:
+
+```bash
+uv run --extra dev alembic stamp head
+```
+
+Do not run `docker compose down -v` unless you intentionally want to delete all local PostgreSQL data.
 
 ## Planned Run Command
 Start the FastAPI application with either of these commands:

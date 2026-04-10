@@ -14,10 +14,12 @@ class OrderRepository:
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    def create_order(self, payload: OrderPricedCreate) -> Order:
-        customer = self.db.get(Customer, payload.customer_id)
-        if customer is None:
+    def validate_customer_exists(self, customer_id: int) -> None:
+        if self.db.get(Customer, customer_id) is None:
             raise NotFoundError("Customer not found")
+
+    def create_order(self, payload: OrderPricedCreate) -> Order:
+        self.validate_customer_exists(payload.customer_id)
 
         product_ids = [item.product_id for item in payload.items]
         if not product_ids:

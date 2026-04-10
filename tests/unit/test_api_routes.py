@@ -166,6 +166,40 @@ def test_order_routes_create_list_status_update_and_delete(
     assert client.delete(f"/orders/{order['id']}").status_code == 204
 
 
+def test_order_route_rejects_client_supplied_item_prices(
+    client: TestClient,
+    api_db_session: Session,
+):
+    customer = _create_customer(api_db_session, email="price-hijack@example.com")
+    product = client.post(
+        "/products",
+        json={
+            "name": "Monitor",
+            "description": "Display",
+            "price": "100.00",
+            "category_id": None,
+        },
+    ).json()
+
+    response = client.post(
+        "/orders",
+        json={
+            "customer_id": customer.id,
+            "status": "pending",
+            "items": [
+                {
+                    "product_id": product["id"],
+                    "quantity": 2,
+                    "unit_price": "0.01",
+                    "line_total": "0.02",
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 422
+
+
 def test_report_routes_return_json_arrays(client: TestClient, api_db_session: Session):
     category = client.post("/categories", json={"name": "Furniture"}).json()
     customer = _create_customer(api_db_session, email="reports-api@example.com")

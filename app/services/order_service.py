@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import DomainValidationError
 from app.models import Order
 from app.repositories import OrderRepository, ProductRepository
-from app.schemas.order import OrderCreate, OrderItemCreate, OrderUpdate
+from app.schemas.order import (
+    OrderCreate,
+    OrderItemPricedCreate,
+    OrderPricedCreate,
+    OrderUpdate,
+)
 
 
 class OrderService:
@@ -21,7 +26,7 @@ class OrderService:
         if not payload.items:
             raise DomainValidationError("Order must include at least one item")
 
-        normalized_items: list[OrderItemCreate] = []
+        normalized_items: list[OrderItemPricedCreate] = []
         total_amount = Decimal("0.00")
         for item in payload.items:
             if item.quantity <= 0:
@@ -32,7 +37,7 @@ class OrderService:
             line_total = unit_price * item.quantity
             total_amount += line_total
             normalized_items.append(
-                OrderItemCreate(
+                OrderItemPricedCreate(
                     product_id=item.product_id,
                     quantity=item.quantity,
                     unit_price=unit_price,
@@ -40,7 +45,7 @@ class OrderService:
                 )
             )
 
-        normalized_payload = OrderCreate(
+        normalized_payload = OrderPricedCreate(
             customer_id=payload.customer_id,
             order_date=payload.order_date,
             total_amount=total_amount,

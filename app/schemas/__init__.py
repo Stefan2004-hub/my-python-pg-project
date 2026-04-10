@@ -6,8 +6,10 @@ from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate
 from app.schemas.order import (
     OrderCreate,
     OrderItemCreate,
+    OrderItemPricedCreate,
     OrderItemRead,
     OrderItemUpdate,
+    OrderPricedCreate,
     OrderRead,
     OrderUpdate,
 )
@@ -22,8 +24,10 @@ __all__ = [
     "CustomerUpdate",
     "OrderCreate",
     "OrderItemCreate",
+    "OrderItemPricedCreate",
     "OrderItemRead",
     "OrderItemUpdate",
+    "OrderPricedCreate",
     "OrderRead",
     "OrderUpdate",
     "OrmSchema",

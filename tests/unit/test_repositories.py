@@ -15,7 +15,7 @@ from app.repositories import (
 )
 from app.schemas.category import CategoryCreate, CategoryUpdate
 from app.schemas.customer import CustomerCreate, CustomerUpdate
-from app.schemas.order import OrderCreate, OrderItemCreate
+from app.schemas.order import OrderItemPricedCreate, OrderPricedCreate
 from app.schemas.product import ProductCreate, ProductUpdate
 
 
@@ -170,13 +170,13 @@ def test_order_repository_creates_nested_items_and_eager_loads_relations(db_sess
     )
 
     created = order_repository.create_order(
-        OrderCreate(
+        OrderPricedCreate(
             customer_id=customer.id,
             order_date=datetime(2026, 4, 5, 12, 0, tzinfo=UTC),
             total_amount=Decimal("399.98"),
             status="pending",
             items=[
-                OrderItemCreate(
+                OrderItemPricedCreate(
                     product_id=product.id,
                     quantity=2,
                     unit_price=Decimal("199.99"),
@@ -220,13 +220,13 @@ def test_order_repository_filters_pagination_and_status_updates(db_session):
 
     for index, status in enumerate(["pending", "pending", "shipped"], start=1):
         order_repository.create_order(
-            OrderCreate(
+            OrderPricedCreate(
                 customer_id=customer.id,
                 order_date=datetime(2026, 4, index, 9, 0, tzinfo=UTC),
                 total_amount=Decimal("89.00"),
                 status=status,
                 items=[
-                    OrderItemCreate(
+                    OrderItemPricedCreate(
                         product_id=product.id,
                         quantity=1,
                         unit_price=Decimal("89.00"),
@@ -252,13 +252,13 @@ def test_order_repository_validates_missing_entities(db_session):
 
     with pytest.raises(NotFoundError, match="Customer not found"):
         order_repository.create_order(
-            OrderCreate(
+            OrderPricedCreate(
                 customer_id=999,
                 order_date=datetime(2026, 4, 5, 12, 0, tzinfo=UTC),
                 total_amount=Decimal("10.00"),
                 status="pending",
                 items=[
-                    OrderItemCreate(
+                    OrderItemPricedCreate(
                         product_id=1,
                         quantity=1,
                         unit_price=Decimal("10.00"),
@@ -287,7 +287,7 @@ def test_order_repository_rejects_empty_item_list(db_session):
 
     with pytest.raises(DomainValidationError, match="at least one item"):
         order_repository.create_order(
-            OrderCreate(
+            OrderPricedCreate(
                 customer_id=customer.id,
                 order_date=datetime(2026, 4, 5, 12, 0, tzinfo=UTC),
                 total_amount=Decimal("0.00"),
@@ -323,13 +323,13 @@ def test_order_repository_delete_removes_order_and_items(db_session):
         )
     )
     order = order_repository.create_order(
-        OrderCreate(
+        OrderPricedCreate(
             customer_id=customer.id,
             order_date=datetime(2026, 4, 5, 12, 0, tzinfo=UTC),
             total_amount=Decimal("55.00"),
             status="pending",
             items=[
-                OrderItemCreate(
+                OrderItemPricedCreate(
                     product_id=product.id,
                     quantity=1,
                     unit_price=Decimal("55.00"),

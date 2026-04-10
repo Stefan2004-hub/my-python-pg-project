@@ -36,14 +36,11 @@ def _order_payload(customer_id: int, product_id: int, quantity: int = 1) -> Orde
     return OrderCreate(
         customer_id=customer_id,
         order_date=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
-        total_amount=Decimal("0.01"),
         status="pending",
         items=[
             OrderItemCreate(
                 product_id=product_id,
                 quantity=quantity,
-                unit_price=Decimal("0.01"),
-                line_total=Decimal("0.01"),
             )
         ],
     )

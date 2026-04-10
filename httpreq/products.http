@@ -1,0 +1,11 @@
+GET http://localhost:8000/products
+###
+POST http://localhost:8000/products
+Content-Type: application/json
+
+{
+  "name": "Product 2",
+  "description": "Description of Product 1",
+  "price": 20,
+  "categoryId": 1
+}

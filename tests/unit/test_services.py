@@ -8,11 +8,12 @@ import pytest
 
 from app.core.exceptions import DomainValidationError, NotFoundError
 from app.schemas.category import CategoryCreate
-from app.schemas.customer import CustomerCreate
+from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.schemas.order import OrderCreate, OrderItemCreate
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.services import (
     CategoryService,
+    CustomerService,
     OrderService,
     ProductService,
     ReportService,
@@ -86,6 +87,30 @@ def test_product_service_rejects_negative_prices(db_session):
                 category_id=None,
             )
         )
+
+
+def test_customer_service_crud_and_rejects_duplicate_email(db_session):
+    customer_service = CustomerService(db_session)
+
+    customer = customer_service.create(_customer_payload("customer@example.com"))
+    with pytest.raises(DomainValidationError, match="email"):
+        customer_service.create(_customer_payload("customer@example.com"))
+
+    items, total = customer_service.list()
+    fetched = customer_service.get_by_id(customer.id)
+    assert fetched.email == "customer@example.com"
+
+    updated = customer_service.update(
+        customer.id,
+        CustomerUpdate(email="updated@example.com"),
+    )
+    customer_service.delete(customer.id)
+
+    assert total == 1
+    assert items[0].id == customer.id
+    assert updated.email == "updated@example.com"
+    with pytest.raises(NotFoundError):
+        customer_service.get_by_id(customer.id)
 
 
 def test_order_service_recomputes_totals_from_product_prices(db_session):

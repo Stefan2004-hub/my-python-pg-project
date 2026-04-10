@@ -70,6 +70,7 @@ def test_api_order_and_report_flow_against_postgres(
             "name": "Integration Product",
             "description": "PostgreSQL-backed product",
             "price": "12.50",
+            "stock_quantity": 4,
             "category_id": category["id"],
         },
     ).json()

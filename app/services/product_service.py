@@ -18,6 +18,7 @@ class ProductService:
 
     def create(self, payload: ProductCreate) -> Product:
         self._validate_price(payload.price)
+        self._validate_stock_quantity(payload.stock_quantity)
         return self.repository.create(payload)
 
     def get_by_id(self, product_id: int) -> Product:
@@ -40,6 +41,8 @@ class ProductService:
     def update(self, product_id: int, payload: ProductUpdate) -> Product:
         if payload.price is not None:
             self._validate_price(payload.price)
+        if payload.stock_quantity is not None:
+            self._validate_stock_quantity(payload.stock_quantity)
         return self.repository.update(product_id, payload)
 
     def delete(self, product_id: int) -> None:
@@ -49,3 +52,8 @@ class ProductService:
     def _validate_price(price: Decimal) -> None:
         if price < 0:
             raise DomainValidationError("Product price cannot be negative")
+
+    @staticmethod
+    def _validate_stock_quantity(stock_quantity: int) -> None:
+        if stock_quantity < 0:
+            raise DomainValidationError("Product stock quantity cannot be negative")

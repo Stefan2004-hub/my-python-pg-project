@@ -94,15 +94,17 @@ def test_product_repository_update_and_delete(db_session):
             name="Mouse",
             description="Wireless mouse",
             price=Decimal("12.99"),
+            stock_quantity=5,
             category_id=None,
         )
     )
 
     updated = product_repository.update(
         product.id,
-        ProductUpdate(price=Decimal("14.99")),
+        ProductUpdate(price=Decimal("14.99"), stock_quantity=7),
     )
     assert updated.price == Decimal("14.99")
+    assert updated.stock_quantity == 7
 
     product_repository.delete(product.id)
     with pytest.raises(NotFoundError):

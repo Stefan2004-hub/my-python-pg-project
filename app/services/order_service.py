@@ -26,13 +26,33 @@ class OrderService:
         if not payload.items:
             raise DomainValidationError("Order must include at least one item")
 
-        normalized_items: list[OrderItemPricedCreate] = []
-        total_amount = Decimal("0.00")
+        self.order_repository.validate_customer_exists(payload.customer_id)
+
+        products = {}
+        requested_quantities: dict[int, int] = {}
         for item in payload.items:
             if item.quantity <= 0:
                 raise DomainValidationError("Order item quantity must be positive")
 
-            product = self.product_repository.get_by_id(item.product_id)
+            product = products.get(item.product_id)
+            if product is None:
+                product = self.product_repository.get_by_id(item.product_id)
+                products[item.product_id] = product
+            requested_quantities[item.product_id] = (
+                requested_quantities.get(item.product_id, 0) + item.quantity
+            )
+
+        for product_id, requested_quantity in requested_quantities.items():
+            product = products[product_id]
+            if requested_quantity > product.stock_quantity:
+                raise DomainValidationError(
+                    f"Insufficient stock for product {product_id}"
+                )
+
+        normalized_items: list[OrderItemPricedCreate] = []
+        total_amount = Decimal("0.00")
+        for item in payload.items:
+            product = products[item.product_id]
             unit_price = product.price
             line_total = unit_price * item.quantity
             total_amount += line_total
@@ -44,6 +64,9 @@ class OrderService:
                     line_total=line_total,
                 )
             )
+
+        for product_id, requested_quantity in requested_quantities.items():
+            products[product_id].stock_quantity -= requested_quantity
 
         normalized_payload = OrderPricedCreate(
             customer_id=payload.customer_id,
